@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition dengan TensorFlow.js</title>
+    <script src="tfjs.js"></script>
+    <script src="blazeface.js"></script>
+</head>
+
+<body>
+    <h1>Face Recognition dengan TensorFlow.js</h1>
+    <h4><a href="object.html" target="_blank">Object Detection</a></h4>
+    <h4><a href="trigger.html" target="_blank">With Audio</a></h4>
+    <h4><a href="webGl.html" target="_blank">With Audio GPU</a></h4>
+
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ 'video': true });
+            video.srcObject = stream;
+            return new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    resolve(video);
+                };
+            });
+        }
+
+        async function detectFaces() {
+            const model = await blazeface.load();
+
+            async function renderPredictions() {
+                const predictions = await model.estimateFaces(video, false);
+
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                predictions.forEach(prediction => {
+                    const start = prediction.topLeft;
+                    const end = prediction.bottomRight;
+                    const size = [end[0] - start[0], end[1] - start[1]];
+
+                    ctx.strokeStyle = 'red';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(start[0], start[1], size[0], size[1]);
+                });
+
+                requestAnimationFrame(renderPredictions);
+            }
+
+            renderPredictions();
+        }
+
+        async function main() {
+            await setupCamera();
+            video.play();
+            detectFaces();
+        }
+
+        main();
+    </script>
+</body>
+
+</html>

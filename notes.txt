@@ -1,0 +1,6 @@
+command : openssl req -nodes -new -x509 -keyout server.key -out server.crt -days 365
+
+cmd prompt allow port(as administrator) : netsh advfirewall firewall add rule name="Open Port 443" dir=in action=allow protocol=TCP localport=443
+
+
+

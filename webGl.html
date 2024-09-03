@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPU-Optimized Face and Object Detection dengan Audio Trigger dan Face Recognition</title>
+    <link rel="stylesheet" href="https://bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row text-center">
+            <h2>GPU-Optimized Face and Object Detection dengan Audio Trigger dan Face Recognition</h2>
+            <h4><a href="index.html">Kembali</a></h4>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col text-center">
+                <video id="video" width="480" height="320" autoplay></video>
+            </div>
+            <div class="col">
+                <canvas id="canvas" width="480" height="320"></canvas>
+            </div>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+
+    <audio id="cupAudio" src="ngetes.mp3"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+        crossorigin="anonymous"></script>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const cupAudio = document.getElementById('cupAudio');
+        const statusDiv = document.getElementById('status');
+
+        let isCupDetected = false;
+        let cupDetectionTimeout;
+        let knownFaces = [];
+        let faceDetectionModel;
+
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ 'video': true });
+            video.srcObject = stream;
+            return new Promise((resolve) => {
+                video.onloadedmetadata = () => {
+                    resolve(video);
+                };
+            });
+        }
+
+        async function loadModels() {
+            const objectModel = await cocoSsd.load();
+            faceDetectionModel = await faceDetection.createDetector(faceDetection.SupportedModels.MediaPipeFaceDetector, {
+                runtime: 'tfjs',
+            });
+            return { objectModel };
+        }
+
+        async function loadKnownFaces() {
+            const faceFiles = ['andre1.jpg', 'andre2.jpg', 'andre3.jpg', 'andre4.jpg', 'andre5.jpg', 'andre6.jpg', 'andre7.jpg']; // Add your face image filenames here
+            for (const file of faceFiles) {
+                const img = new Image();
+                img.src = `/face/${file}`;
+                await new Promise((resolve) => {
+                    img.onload = async () => {
+                        const detections = await faceDetectionModel.estimateFaces(img, {
+                            flipHorizontal: false
+                        });
+                        if (detections.length > 0) {
+                            knownFaces.push({
+                                name: file.split('.')[0],
+                                keypoints: detections[0].keypoints
+                            });
+                        }
+                        resolve();
+                    };
+                });
+            }
+        }
+
+        function playCupAudio() {
+            cupAudio.volume = 1;
+            cupAudio.play();
+        }
+
+        function calculateDistance(keypoints1, keypoints2) {
+            return keypoints1.reduce((sum, kp1, i) => {
+                const kp2 = keypoints2[i];
+                const dx = kp1.x - kp2.x;
+                const dy = kp1.y - kp2.y;
+                return sum + Math.sqrt(dx * dx + dy * dy);
+            }, 0);
+        }
+
+        function recognizeFace(detectedKeypoints) {
+            let minDistance = Infinity;
+            let recognizedName = 'Unknown';
+
+            for (const knownFace of knownFaces) {
+                const distance = calculateDistance(detectedKeypoints, knownFace.keypoints);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    recognizedName = knownFace.name;
+                }
+            }
+
+            return recognizedName;
+        }
+
+        async function detectFacesAndObjects(objectModel) {
+            const renderPredictions = async () => {
+                const videoFrame = tf.browser.fromPixels(video);
+
+                const faceDetections = await faceDetectionModel.estimateFaces(video, {
+                    flipHorizontal: false
+                });
+                const objectPredictions = await objectModel.detect(videoFrame);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                faceDetections.forEach((detection) => {
+                    const { box, keypoints } = detection;
+                    const x = box.xMin * canvas.width;
+                    const y = box.yMin * canvas.height;
+                    const width = (box.xMax - box.xMin) * canvas.width;
+                    const height = (box.yMax - box.yMin) * canvas.height;
+
+                    ctx.strokeStyle = 'red';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x, y, width, height);
+
+                    const name = recognizeFace(keypoints);
+                    ctx.fillStyle = 'red';
+                    ctx.fillText(name, x, y > 10 ? y - 5 : 10);
+                });
+
+                let cupDetectedThisFrame = false;
+                objectPredictions.forEach(prediction => {
+                    const [x, y, width, height] = prediction.bbox;
+
+                    ctx.strokeStyle = 'green';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x, y, width, height);
+                    ctx.fillStyle = 'green';
+                    ctx.fillText(
+                        `${prediction.class} (${Math.round(prediction.score * 100)}%)`,
+                        x, y > 10 ? y - 5 : 10
+                    );
+                    const predict = prediction.class.toLowerCase()
+                    if (predict === 'person' || predict === 'cell phone' || predict === 'cup' || predict === 'book' || predict === 'laptop') {
+                        cupDetectedThisFrame = true;
+                    }
+                });
+
+                if (cupDetectedThisFrame && !isCupDetected) {
+                    isCupDetected = true;
+                    playCupAudio();
+                    clearTimeout(cupDetectionTimeout);
+                    cupDetectionTimeout = setTimeout(() => {
+                        isCupDetected = false;
+                    }, 5000);
+                }
+
+                videoFrame.dispose();
+
+                requestAnimationFrame(renderPredictions);
+            };
+
+            renderPredictions();
+        }
+
+        async function main() {
+            try {
+                await setupCamera();
+                video.play();
+                statusDiv.textContent = 'Loading models...';
+                const { objectModel } = await loadModels();
+                statusDiv.textContent = 'Loading known faces...';
+                await loadKnownFaces();
+                statusDiv.textContent = 'Ready';
+                detectFacesAndObjects(objectModel);
+            } catch (error) {
+                console.error('Error:', error);
+                statusDiv.textContent = 'Error: ' + error.message;
+            }
+        }
+
+        main();
+    </script>
+</body>
+
+</html>
