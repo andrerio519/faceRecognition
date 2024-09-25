@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <title>Peta Interaktif Sungai Kunjang</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+        integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
+   
+</head>
+
+<body>
+    <div class="container">
+        <div class="navbar">
+            <a href="index.html">Home</a>
+            <a href="chloropeth.html">Chloropeth</a>
+            <a href="chloropethMultiData.html">Chloropeth 2</a>
+            <a href="chloropethJSONData.html">Chloropeth From JSON</a>
+        </div>
+    </div>
+    <div class="container">
+        <h1 class="text-center mt-5">Peta Interaktif Sungai Kunjang</h1>
+        <p class="text-center">Peta ini menampilkan data kecamatan Sungai kunjang.</p>
+        <div class="row mt-5">
+            <div class="col-12">
+                <div id="map" style="width: 100%; height: 600px;"></div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Inisialisasi peta
+        var map = L.map('map').setView([-0.490812, 117.126616], 13);
+
+        // Tambahkan tile layer dari OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Data populasi per kelurahan
+        var populationData = {
+            "Lok Bahu": { "pria": 5000, "wanita": 3000 },
+            "Loa Bakung": { "pria": 3000, "wanita": 2000 },
+            "Loa Buah": { "pria": 7000, "wanita": 9000 },
+            "Karang Anyar": { "pria": 8000, "wanita": 3000 },
+            "Karang Asam Ilir": { "pria": 3000, "wanita": 3000 },
+            "Karang Asam Ulu": { "pria": 9000, "wanita": 8000 },
+            "Teluk Lerong Ulu": { "pria": 7000, "wanita": 6000 }
+            // Tambahkan data sesuai kelurahan Anda
+        };
+
+        // Fungsi untuk menampilkan popup dengan jumlah penduduk dan mengubah warna saat diklik
+        function onEachFeature(feature, layer) {
+            if (feature.properties && feature.properties.NAMOBJ) {
+                var kelurahanName = feature.properties.NAMOBJ;
+                var population = populationData[kelurahanName];
+                var popupContent;
+
+                if (population) {
+                    popupContent = "<b>" + kelurahanName + "</b><br>Pria: " + population.pria + "<br>Wanita: " + population.wanita;
+                } else {
+                    popupContent = "<b>" + kelurahanName + "</b><br>Data tidak tersedia";
+                }
+
+                layer.bindPopup(popupContent);
+
+                // Event listener untuk mengubah warna area saat diklik
+                layer.on('click', function (e) {
+                    layer.setStyle({
+                        fillColor: '#ff7800',
+                        weight: 2,
+                        opacity: 1,
+                        color: 'white',
+                        dashArray: '3',
+                        fillOpacity: 0.7
+                    });
+                });
+            }
+        }
+
+
+        // Memuat file GeoJSON
+        fetch('Kunjang.geoJson')
+            .then(response => response.json())
+            .then(data => {
+                L.geoJson(data, {
+                    onEachFeature: onEachFeature
+                }).addTo(map);
+            });
+
+        // Chart
+        // Mendapatkan kelurahan (labels) dan data pria/wanita (datasets)
+        var labels = Object.keys(populationData);
+        var priaData = labels.map(function (kelurahan) {
+            return populationData[kelurahan].pria;
+        });
+        var wanitaData = labels.map(function (kelurahan) {
+            return populationData[kelurahan].wanita;
+        });
+
+        
+        const ctx = document.getElementById('myChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels, // Kelurahan sebagai labels
+                datasets: [
+                    {
+                        label: 'Pria',
+                        data: priaData, // Data pria per kelurahan
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)', // Warna biru transparan
+                        borderColor: 'rgba(54, 162, 235, 1)', // Warna biru solid
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Wanita',
+                        data: wanitaData, // Data wanita per kelurahan
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)', // Warna merah transparan
+                        borderColor: 'rgba(255, 99, 132, 1)', // Warna merah solid
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

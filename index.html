@@ -4,205 +4,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GPU-Optimized Face and Object Detection dengan Audio Trigger dan Face Recognition</title>
-    <link rel="stylesheet" href="https://bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_detection"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/face-detection"></script>
+    <title>Smart Detection App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+
+    <script src="assets/js/tfjs.js"></script>
+    <script src="assets/js/blazeface.js"></script>
+    <script src="assets/js/coco-ssd.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
 </head>
 
 <body>
     <div class="container">
-        <div class="row text-center">
-            <h2>GPU-Optimized Face and Object Detection dengan Audio Trigger dan Face Recognition</h2>
-            <h4><a href="index.html">Kembali</a></h4>
-        </div>
-        <div class="row justify-content-center">
-            <div class="col text-center">
-                <video id="video" width="480" height="320" autoplay></video>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">Smart Tools App</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <!-- <li class="nav-item">
+                            <a class="nav-link active" aria-current="page" href="#">Tools</a>
+                        </li> -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                Other Tools
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                <li><a class="dropdown-item" href="tools/visualization/chloropethJSONData.html" target="_blank">Chloropeth Chart</a></li>
+                                <li><a class="dropdown-item" href="tools/presentStatic/index.html" target="_blank">Absen</a></li>
+                                <li><a class="dropdown-item" href="tools/downloadWElement.html" target="_blank">Download With Element</a></li>
+                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Object Detection</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="col">
-                <canvas id="canvas" width="480" height="320"></canvas>
+        </nav>
+
+        <header class="bg-white shadow-sm">
+            <div class="container py-3">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900">Smart Detection App</h1>
             </div>
-        </div>
+        </header>
 
-        <div id="status"></div>
-    </div>
+        <main>
+            <div class="container py-3">
+                <div class="row">
+                    <div class="col-md-8">
+                        <video id="video" autoplay></video>
+                        <canvas id="canvas" width="640" height="480"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="bg-white shadow-sm p-3">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="bg-indigo-500 rounded-md p-3 text-white">
+                                        <i class="fas fa-mug-hot"></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Cup Detection</dt>
+                                            <dd class="text-lg font-medium text-gray-900" id="cupStatus">Inactive</dd>
+                                            <div class="flex flex-wrap">
+                                                <input type="checkbox" id="cup-play-triggers" name="cup-triggers">
+                                                <label for="cup-play-triggers">Play cup audio when detected</label>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <div class="bg-green-500 rounded-md p-3 text-white">
+                                        <i class="fas fa-cat"></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Cat Detection</dt>
+                                            <dd class="text-lg font-medium text-gray-900" id="catStatus">Inactive</dd>
+                                            <div class="flex flex-wrap">
+                                                <input type="checkbox" id="cat-play-triggers" name="cat-triggers">
+                                                <label for="cat-play-triggers">Play cat audio when detected</label>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <div class="bg-red-500 rounded-md p-3 text-white">
+                                        <i class="fas fa-user-secret"></i>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-medium text-gray-500 truncate">Person Detection</dt>
+                                            <dd class="text-lg font-medium text-gray-900" id="personStatus">Inactive
+                                            </dd>
+                                            <div class="flex flex-wrap">
+                                                <input type="checkbox" id="person-play-triggers" name="person-triggers">
+                                                <label for="person-play-triggers">Play person audio when
+                                                    detected</label>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
 
+        <audio id="cupAudio" src="assets/sound/cup.mp3"></audio>
+        <audio id="kucingAudio" src="assets/sound/kucing.mp3"></audio>
+        <audio id="malingAudio" src="assets/sound/awas.mp3"></audio>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+            integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+            crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+            integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+            crossorigin="anonymous"></script>
+        <script src="assets/js/kamus.js"></script>
+        <script>
+            const video = document.getElementById("video");
+            const canvas = document.getElementById("canvas");
+            const ctx = canvas.getContext("2d");
 
-    <audio id="cupAudio" src="ngetes.mp3"></audio>
+            const cupAudio = document.getElementById("cupAudio");
+            const kucingAudio = document.getElementById("kucingAudio");
+            const malingAudio = document.getElementById("malingAudio");
 
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
-        integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
-        integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
-        crossorigin="anonymous"></script>
-    <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const cupAudio = document.getElementById('cupAudio');
-        const statusDiv = document.getElementById('status');
+            const cupStatus = document.getElementById("cupStatus");
+            const catStatus = document.getElementById("catStatus");
+            const personStatus = document.getElementById("personStatus");
 
-        let isCupDetected = false;
-        let cupDetectionTimeout;
-        let knownFaces = [];
-        let faceDetectionModel;
+            let isCupDetected = false;
+            let isKucingDetected = false;
+            let isMalingDetected = false;
+            let cupDetectionTimeout;
+            let kucingDetectionTimeout;
+            let malingDetectionTimeout;
 
-        async function setupCamera() {
-            const stream = await navigator.mediaDevices.getUserMedia({ 'video': true });
-            video.srcObject = stream;
-            return new Promise((resolve) => {
-                video.onloadedmetadata = () => {
-                    resolve(video);
-                };
-            });
-        }
-
-        async function loadModels() {
-            const objectModel = await cocoSsd.load();
-            faceDetectionModel = await faceDetection.createDetector(faceDetection.SupportedModels.MediaPipeFaceDetector, {
-                runtime: 'tfjs',
-            });
-            return { objectModel };
-        }
-
-        async function loadKnownFaces() {
-            const faceFiles = ['andre1.jpg', 'andre2.jpg', 'andre3.jpg', 'andre4.jpg', 'andre5.jpg', 'andre6.jpg', 'andre7.jpg']; // Add your face image filenames here
-            for (const file of faceFiles) {
-                const img = new Image();
-                img.src = `/face/${file}`;
-                await new Promise((resolve) => {
-                    img.onload = async () => {
-                        const detections = await faceDetectionModel.estimateFaces(img, {
-                            flipHorizontal: false
-                        });
-                        if (detections.length > 0) {
-                            knownFaces.push({
-                                name: file.split('.')[0],
-                                keypoints: detections[0].keypoints
-                            });
-                        }
-                        resolve();
+            async function setupCamera() {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: true,
+                });
+                video.srcObject = stream;
+                return new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        resolve(video);
                     };
                 });
             }
-        }
 
-        function playCupAudio() {
-            cupAudio.volume = 1;
-            cupAudio.play();
-        }
-
-        function calculateDistance(keypoints1, keypoints2) {
-            return keypoints1.reduce((sum, kp1, i) => {
-                const kp2 = keypoints2[i];
-                const dx = kp1.x - kp2.x;
-                const dy = kp1.y - kp2.y;
-                return sum + Math.sqrt(dx * dx + dy * dy);
-            }, 0);
-        }
-
-        function recognizeFace(detectedKeypoints) {
-            let minDistance = Infinity;
-            let recognizedName = 'Unknown';
-
-            for (const knownFace of knownFaces) {
-                const distance = calculateDistance(detectedKeypoints, knownFace.keypoints);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    recognizedName = knownFace.name;
-                }
+            async function loadModels() {
+                const faceModel = await blazeface.load();
+                const objectModel = await cocoSsd.load();
+                return {
+                    faceModel,
+                    objectModel,
+                };
             }
 
-            return recognizedName;
-        }
+            function playCupAudio() {
+                cupAudio.volume = 1;
+                cupAudio.play();
+                cupStatus.textContent = "Active";
+                cupStatus.classList.add("text-indigo-600");
+            }
 
-        async function detectFacesAndObjects(objectModel) {
-            const renderPredictions = async () => {
-                const videoFrame = tf.browser.fromPixels(video);
+            function playKucingAudio() {
+                kucingAudio.volume = 1;
+                kucingAudio.play();
+                catStatus.textContent = "Active";
+                catStatus.classList.add("text-green-600");
+            }
 
-                const faceDetections = await faceDetectionModel.estimateFaces(video, {
-                    flipHorizontal: false
-                });
-                const objectPredictions = await objectModel.detect(videoFrame);
+            function playMalingAudio() {
+                malingAudio.volume = 1;
+                malingAudio.play();
+                personStatus.textContent = "Active";
+                personStatus.classList.add("text-red-600");
+            }
 
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            async function detectFacesAndObjects(faceModel, objectModel) {
+                async function renderPredictions() {
+                    const facePredictions = await faceModel.estimateFaces(video, false);
+                    const objectPredictions = await objectModel.detect(video);
 
-                faceDetections.forEach((detection) => {
-                    const { box, keypoints } = detection;
-                    const x = box.xMin * canvas.width;
-                    const y = box.yMin * canvas.height;
-                    const width = (box.xMax - box.xMin) * canvas.width;
-                    const height = (box.yMax - box.yMin) * canvas.height;
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                    ctx.strokeStyle = 'red';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(x, y, width, height);
+                    facePredictions.forEach((prediction) => {
+                        const start = prediction.topLeft;
+                        const end = prediction.bottomRight;
+                        const size = [end[0] - start[0], end[1] - start[1]];
 
-                    const name = recognizeFace(keypoints);
-                    ctx.fillStyle = 'red';
-                    ctx.fillText(name, x, y > 10 ? y - 5 : 10);
-                });
+                        ctx.strokeStyle = "red";
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(start[0], start[1], size[0], size[1]);
+                        ctx.fillStyle = "red";
+                        ctx.fillText("Face", start[0], start[1] > 10 ? start[1] - 5 : 10);
+                    });
 
-                let cupDetectedThisFrame = false;
-                objectPredictions.forEach(prediction => {
-                    const [x, y, width, height] = prediction.bbox;
+                    let cupDetectedThisFrame = false;
+                    let malingDetectedThisFrame = false;
+                    let kucingDetectedThisFrame = false;
+                    objectPredictions.forEach((prediction) => {
+                        const [x, y, width, height] = prediction.bbox;
 
-                    ctx.strokeStyle = 'green';
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(x, y, width, height);
-                    ctx.fillStyle = 'green';
-                    ctx.fillText(
-                        `${prediction.class} (${Math.round(prediction.score * 100)}%)`,
-                        x, y > 10 ? y - 5 : 10
-                    );
-                    const predict = prediction.class.toLowerCase()
-                    if (predict === 'person' || predict === 'cell phone' || predict === 'cup' || predict === 'book' || predict === 'laptop') {
-                        cupDetectedThisFrame = true;
+                        ctx.strokeStyle = "green";
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, width, height);
+                        ctx.fillStyle = "green";
+                        // Terjemahkan nama kelas ke Bahasa Indonesia
+                        const translatedClass = translateToIndonesian(prediction.class);
+                        ctx.fillText(`${translatedClass} (${Math.round(prediction.score * 100)}%)`, x, y > 10 ? y - 5 : 10);
+
+                        if (translatedClass.toLowerCase() === "cangkir") {
+                            cupDetectedThisFrame = true;
+                        }
+                        if (translatedClass.toLowerCase() === "kucing") {
+                            kucingDetectedThisFrame = true;
+                        }
+                        if (translatedClass.toLowerCase() === "orang") {
+                            malingDetectedThisFrame = true;
+                        }
+                    });
+
+                    if (cupDetectedThisFrame && !isCupDetected && document.getElementById("cup-play-triggers").checked) {
+                        isCupDetected = true;
+                        playCupAudio();
+                        clearTimeout(cupDetectionTimeout);
+                        cupDetectionTimeout = setTimeout(() => {
+                            isCupDetected = false;
+                            cupStatus.textContent = "Inactive";
+                            cupStatus.classList.remove("text-indigo-600");
+                        }, 5000);
                     }
-                });
 
-                if (cupDetectedThisFrame && !isCupDetected) {
-                    isCupDetected = true;
-                    playCupAudio();
-                    clearTimeout(cupDetectionTimeout);
-                    cupDetectionTimeout = setTimeout(() => {
-                        isCupDetected = false;
-                    }, 5000);
+                    if (kucingDetectedThisFrame && !isKucingDetected && document.getElementById("cat-play-triggers").checked) {
+                        isKucingDetected = true;
+                        playKucingAudio();
+                        clearTimeout(kucingDetectionTimeout);
+                        kucingDetectionTimeout = setTimeout(() => {
+                            isKucingDetected = false;
+                            catStatus.textContent = "Inactive";
+                            catStatus.classList.remove("text-green-600");
+                        }, 5000);
+                    }
+
+                    if (malingDetectedThisFrame && !isMalingDetected && document.getElementById("person-play-triggers").checked) {
+                        isMalingDetected = true;
+                        playMalingAudio();
+                        clearTimeout(malingDetectionTimeout);
+                        malingDetectionTimeout = setTimeout(() => {
+                            isMalingDetected = false;
+                            personStatus.textContent = "Inactive";
+                            personStatus.classList.remove("text-red-600");
+                        }, 5000);
+                    }
+
+                    requestAnimationFrame(renderPredictions);
                 }
 
-                videoFrame.dispose();
+                renderPredictions();
+            }
 
-                requestAnimationFrame(renderPredictions);
-            };
-
-            renderPredictions();
-        }
-
-        async function main() {
-            try {
+            async function main() {
                 await setupCamera();
                 video.play();
-                statusDiv.textContent = 'Loading models...';
-                const { objectModel } = await loadModels();
-                statusDiv.textContent = 'Loading known faces...';
-                await loadKnownFaces();
-                statusDiv.textContent = 'Ready';
-                detectFacesAndObjects(objectModel);
-            } catch (error) {
-                console.error('Error:', error);
-                statusDiv.textContent = 'Error: ' + error.message;
+                const { faceModel, objectModel } = await loadModels();
+                detectFacesAndObjects(faceModel, objectModel);
             }
-        }
 
-        main();
-    </script>
+            main();
+        </script>
+
+    </div>
 </body>
 
 </html>

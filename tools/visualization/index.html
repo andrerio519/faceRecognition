@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peta Interaktif Samarinda</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+        integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <link rel="stylesheet" href="code.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+
+    <style>
+        #map {
+            height: 400px;
+        }
+    </style>
+    
+
+
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="navbar">
+            <a href="index.html">Home</a>
+            <a href="chloropeth.html">Chloropeth</a>
+            <a href="chloropethMultiData.html">Chloropeth 2</a>
+            <a href="chloropethJSONData.html">Chloropeth From JSON</a>
+        </div>
+    </div>
+    <div class="container">
+        <h1 class="text-center mt-5">Peta Interaktif Samarinda</h1>
+        <p class="text-center">Peta ini menampilkan data kecamatan di Kota Samarinda.</p>
+        <div class="row mt-5">
+            <div class="col">
+                <div id="map"></div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col">
+                <pre><code class="language-javascript">
+                    var map = L.map('map').setView([-0.5022, 117.1536], 11);
+
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    // Data kecamatan (contoh, perlu disesuaikan dengan data sebenarnya)
+                    var kecamatan = [
+                        { name: "Samarinda Utara", lat: -0.4478, lon: 117.1751, data: 1000 },
+                        { name: "Samarinda Ulu", lat: -0.4797, lon: 117.1535, data: 1500 },
+                        { name: "Samarinda Ilir", lat: -0.5025, lon: 117.1419, data: 2000 },
+                        { name: "Samarinda Seberang", lat: -0.5333, lon: 117.1833, data: 1200 },
+                    ];
+
+                    kecamatan.forEach(function (kec) {
+                        var marker = L.marker([kec.lat, kec.lon]).addTo(map);
+                        marker.bindPopup("<b>" + kec.name + "</b><br>Data: " + kec.data);
+                    });
+                    </code></pre>
+                <button onclick="copyToClipboard()">Salin Kode</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        var map = L.map('map').setView([-0.5022, 117.1536], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Data kecamatan (contoh, perlu disesuaikan dengan data sebenarnya)
+        var kecamatan = [
+            { name: "Samarinda Utara", lat: -0.4478, lon: 117.1751, data: 1000 },
+            { name: "Samarinda Ulu", lat: -0.4797, lon: 117.1535, data: 1500 },
+            { name: "Samarinda Ilir", lat: -0.5025, lon: 117.1419, data: 2000 },
+            { name: "Samarinda Seberang", lat: -0.5333, lon: 117.1833, data: 1200 },
+        ];
+
+        kecamatan.forEach(function (kec) {
+            var marker = L.marker([kec.lat, kec.lon]).addTo(map);
+            marker.bindPopup("<b>" + kec.name + "</b><br>Data: " + kec.data);
+        });
+    </script>
+    
+</body>
+
+</html>

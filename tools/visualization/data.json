@@ -1,0 +1,39 @@
+[
+	{ "Kelurahan": "Karang Anyar", "1.Fahruddin S.Hut": 322, "4.Teguh Adi Nugraha SH": 299, "2.Siti Salasiah": 130, "Coblos Partai": 177, "6.Suryaningsih S.Kom": 86, "7.Fuad Noor Rahman": 51, "5.Adam Ahmidillah": 50, "3.Juniansyah S.H": 13 },
+	{
+		"Kelurahan": "Karang Asam Ilir",
+		"1.Fahruddin S.Hut": 223,
+		"4.Teguh Adi Nugraha SH": 432,
+		"2.Siti Salasiah": 165,
+		"Coblos Partai": 102,
+		"6.Suryaningsih S.Kom": 61,
+		"7.Fuad Noor Rahman": 45,
+		"5.Adam Ahmidillah": 49,
+		"3.Juniansyah S.H": 21
+	},
+	{
+		"Kelurahan": "Karang Asam Ulu",
+		"1.Fahruddin S.Hut": 207,
+		"4.Teguh Adi Nugraha SH": 252,
+		"2.Siti Salasiah": 83,
+		"Coblos Partai": 124,
+		"6.Suryaningsih S.Kom": 90,
+		"7.Fuad Noor Rahman": 156,
+		"5.Adam Ahmidillah": 18,
+		"3.Juniansyah S.H": 17
+	},
+	{ "Kelurahan": "Loa Bakung", "1.Fahruddin S.Hut": 265, "4.Teguh Adi Nugraha SH": 147, "2.Siti Salasiah": 398, "Coblos Partai": 171, "6.Suryaningsih S.Kom": 91, "7.Fuad Noor Rahman": 99, "5.Adam Ahmidillah": 85, "3.Juniansyah S.H": 26 },
+	{ "Kelurahan": "Loa Buah", "1.Fahruddin S.Hut": 53, "4.Teguh Adi Nugraha SH": 53, "2.Siti Salasiah": 317, "Coblos Partai": 54, "6.Suryaningsih S.Kom": 42, "7.Fuad Noor Rahman": 6, "5.Adam Ahmidillah": 21, "3.Juniansyah S.H": 7 },
+	{ "Kelurahan": "Lok Bahu", "1.Fahruddin S.Hut": 1434, "4.Teguh Adi Nugraha SH": 257, "2.Siti Salasiah": 223, "Coblos Partai": 322, "6.Suryaningsih S.Kom": 200, "7.Fuad Noor Rahman": 81, "5.Adam Ahmidillah": 47, "3.Juniansyah S.H": 39 },
+	{
+		"Kelurahan": "Teluk Lerong Ulu",
+		"1.Fahruddin S.Hut": 104,
+		"4.Teguh Adi Nugraha SH": 197,
+		"2.Siti Salasiah": 51,
+		"Coblos Partai": 90,
+		"6.Suryaningsih S.Kom": 112,
+		"7.Fuad Noor Rahman": 22,
+		"5.Adam Ahmidillah": 13,
+		"3.Juniansyah S.H": 9
+	}
+]

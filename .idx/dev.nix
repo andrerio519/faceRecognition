@@ -6,19 +6,72 @@
 
   # Use https://search.nixos.org/packages to find packages
   packages = [
-    # pkgs.go
-    # pkgs.python311
-    # pkgs.python311Packages.pip
-    # pkgs.nodejs_20
-    # pkgs.nodePackages.nodemon
+    pkgs.go
+    pkgs.python311
+    pkgs.python311Packages.pip
+    pkgs.nodejs_20
+    pkgs.nodePackages.nodemon
   ];
-
+  
   # Sets environment variables in the workspace
   env = {};
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
       # "vscodevim.vim"
+      "42Crunch.vscode-openapi"
+      "AMiner.codegeex"
+      "amiralizadeh9480.laravel-extra-intellisense"
+      "batisteo.vscode-django"
+      "bmewburn.vscode-intelephense-client"
+      "bradlc.vscode-tailwindcss"
+      "codingyu.laravel-goto-view"
+      "dbaeumer.vscode-eslint"
+      "donjayamanne.python-environment-manager"
+      "donjayamanne.python-extension-pack"
+      "dsznajder.es7-react-js-snippets"
+      "ecmel.vscode-html-css"
+      "EditorConfig.EditorConfig"
+      "esbenp.prettier-vscode"
+      "felixfbecker.php-pack"
+      "formulahendry.auto-close-tag"
+      "formulahendry.auto-complete-tag"
+      "formulahendry.auto-rename-tag"
+      "golang.go"
+      "HansUXdev.bootstrap5-snippets"
+      "humao.rest-client"
+      "KevinRose.vsc-python-indent"
+      "mathiasfrohlich.Kotlin"
+      "mechatroner.rainbow-csv"
+      "MehediDracula.php-namespace-resolver"
+      "mikestead.dotenv"
+      "mohamedbenhida.laravel-intellisense"
+      "ms-python.debugpy"
+      "ms-python.python"
+      "ms-toolsai.jupyter"
+      "ms-toolsai.jupyter-keymap"
+      "ms-toolsai.jupyter-renderers"
+      "ms-toolsai.vscode-jupyter-cell-tags"
+      "ms-toolsai.vscode-jupyter-slideshow"
+      "ms-vscode.cmake-tools"
+      "ms-vscode.cpptools-themes"
+      "ms-vscode.makefile-tools"
+      "ms-vscode.powershell"
+      "naoray.laravel-goto-components"
+      "njpwerner.autodocstring"
+      "njqdev.vscode-python-typehint"
+      "onecentlin.laravel-blade"
+      "onecentlin.laravel5-snippets"
+      "pranaygp.vscode-css-peek"
+      "Prisma.prisma"
+      "redhat.vscode-yaml"
+      "ritwickdey.LiveServer"
+      "shufo.vscode-blade-formatter"
+      "twxs.cmake"
+      "wholroyd.jinja"
+      "xdebug.php-debug"
+      "Zignd.html-css-class-completion"
+      "zobo.php-intellisense"
     ];
 
     # Enable previews
@@ -30,10 +83,10 @@
         #   # and show it in IDX's web preview panel
         #   command = ["npm" "run" "dev"];
         #   manager = "web";
-        #   env = {
-        #     # Environment variables to set for your server
-        #     PORT = "$PORT";
-        #   };
+          # env = {
+          #   # Environment variables to set for your server
+          #   PORT = "$PORT";
+          # };
         # };
       };
     };

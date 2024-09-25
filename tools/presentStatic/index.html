@@ -1,0 +1,130 @@
+<?php ?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absen Webcam GPS</title>
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js" integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/" crossorigin="anonymous"></script>
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="leaflet.js"></script>
+    <!-- Webcam -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.js" integrity="sha512-AQMSn1qO6KN85GOfvH6BWJk46LhlvepblftLHzAv1cdIyTWPBKHX+r+NOXVVw6+XQpeW4LJk/GTmoP48FLvblQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        #map {
+            height: 220px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <h1 class="text-center">Absensi Online Tes</h1>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div id="my_camera" style="width:auto; height:auto"></div>
+                </div>
+                <div class="card" id="result">
+                    <div id="alert"></div>
+                    <div id="demo"></div>
+                    <div id="map"></div>
+                </div>
+            </div>
+            <div class="col-md-8 text-center">
+                <button onclick="getLocation()" class="btn btn-primary mt-2 mb-2 absen">Absen Sekarang</button>
+            </div>
+        </div>
+        <div class="row">
+            <div id="my_result"></div>
+        </div>
+    </div>
+    <script>
+        Webcam.set({
+            width: 320,
+            height: 240,
+            image_format: 'jpeg',
+            jpeg_quality: 90,
+            force_flash: false
+        });
+        Webcam.attach('#my_camera');
+
+        function take_snapshot() {
+            Webcam.snap(function(data_uri) {
+                document.getElementById('my_result').innerHTML = '<img src="' + data_uri + '" class="img-thumbnail"/>';
+            });
+        }
+
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        var result = document.getElementById("result");
+
+        result.style.display = "none";
+
+        function showPosition(position) {
+            result.style.display = "block";
+            document.querySelector(".absen").style.display = "none";
+            take_snapshot()
+            var now = new Date();
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            var absenLat = -0.4990389; // koordinat latitude lokasi absen
+            var absenLng = 117.0655975; // koordinat longitude lokasi absen
+            var distance = L.latLng(lat, lng).distanceTo(L.latLng(absenLat, absenLng)); // menghitung jarak antara lokasi pengguna dan lokasi absen dalam satuan meter
+            var maxDistance = 10; // jarak maksimum dalam meter
+            var x = document.getElementById("demo");
+
+            x.innerHTML =
+                "Latitude : " + lat +
+                "<br>Longitude : " + lng +
+                "<br>Absen Pada : " + now;
+            var map = L.map("map").setView([lat, lng], 16);
+            var marker = L.marker([lat, lng]);
+
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                attribution: ` &copy; ${now.getFullYear()} <a href='https://andrerio.tech/'> PresensiOnline</a> developmentMode`,
+                maxZoom: 18,
+            }).addTo(map);
+
+            var circle = L.circle([absenLat, absenLng], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5,
+                radius: 10
+            }).addTo(map);
+            var alert = document.getElementById("alert");
+            if (distance > maxDistance) {
+                var distanceInMeter = (distance).toFixed(0); // membulatkan nilai jarak menjadi bilangan bulat
+                var lokasiAnda = "Anda berada " + distanceInMeter + " meter dari lokasi absensi";
+                alert.innerHTML = "<div class='alert alert-danger alert-dismissible fade show' role='alert'>Anda berada " + distanceInMeter + " meter dari lokasi absensi<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button></div>";
+                // alert("Anda berada " + distanceInMeter + " meter dari lokasi absensi! Lakukan presensi pada lokasi absen")
+            } else {
+                var lokasiAnda = "Anda Berada Dilokasi Absen";
+                alert.innerHTML = "<div class='alert alert-success alert-dismissible fade show' role='alert'>Absen Presensi telah disimpan pada" + now + "<button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button></div>";
+                // alert("Absen Presensi telah disimpan pada " + now)
+            }
+
+            circle.bindPopup("Lokasi Absensi").openPopup();
+            marker.addTo(map).bindPopup(lokasiAnda).openPopup();
+
+
+
+        }
+    </script>
+</body>
+
+</html>

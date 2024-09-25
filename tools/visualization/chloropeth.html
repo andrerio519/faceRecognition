@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Peta Interaktif Sungai Kunjang</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css"
+        integrity="sha384-r4NyP46KrjDleawBgD5tp8Y7UzmLA05oM1iAEQ17CSuDqnUK2+k9luXQOfXJCJ4I" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="code.css">
+    <script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"
+        integrity="sha384-oesi62hOLfzrys4LxRF63OJCXdXDipiYWBnvTl9Y9/TRlw5xlKIEHpNyvvDShgf/"
+        crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="navbar">
+            <a href="index.html">Home</a>
+            <a href="chloropeth.html">Chloropeth</a>
+            <a href="chloropethMultiData.html">Chloropeth 2</a>
+            <a href="chloropethJSONData.html">Chloropeth From JSON</a>
+        </div>
+    </div>
+    <div class="container">
+        <h1 class="text-center mt-5">Peta Interaktif Sungai Kunjang</h1>
+        <p class="text-center">Peta ini menampilkan data kecamatan Sungai kunjang.</p>
+        <div class="row mt-5">
+            <div class="col">
+                <div id="map" style="width: 100%; height: 600px;"></div>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col">
+                <h3>Contoh Kode Javascript</h3>
+                <pre><code class="language-javascript">
+                    // Inisialisasi peta
+                    var map = L.map('map').setView([-0.490812, 117.126616], 13);
+
+                    // Tambahkan tile layer dari OpenStreetMap
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    // Data populasi per kelurahan (contoh data, sesuaikan dengan data Anda)
+                    var populationData = {
+                        "Lok Bahu": 5000,
+                        "Loa Bakung": 4000,
+                        "Loa Buah": 4000,
+                        "Karang Anyar": 4000,
+                        "Karang Asam Ilir": 4000,
+                        "Karang Asam Ulu": 4000,
+                        "Teluk Lerong Ulu": 4000
+                        // Tambahkan data sesuai kelurahan Anda
+                    };
+
+                    // Fungsi untuk menampilkan popup dengan jumlah penduduk
+                    function onEachFeature(feature, layer) {
+                        if (feature.properties && feature.properties.NAMOBJ) {
+                            var kelurahanName = feature.properties.NAMOBJ;
+                            var population = populationData[kelurahanName] || 'Data tidak tersedia';
+                            layer.bindPopup("<b>" + kelurahanName + "</b><br>Jumlah Penduduk: " + population);
+                        }
+                    }
+
+                    // Memuat file GeoJSON
+                    fetch('Kunjang.geoJson')
+                        .then(response => response.json())
+                        .then(data => {
+                            L.geoJson(data, {
+                                onEachFeature: onEachFeature
+                            }).addTo(map);
+                        });
+                    </code></pre>
+                <button onclick="copyToClipboard()">Salin Kode</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        // Inisialisasi peta
+        var map = L.map('map').setView([-0.490812, 117.126616], 13);
+
+        // Tambahkan tile layer dari OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Data populasi per kelurahan (contoh data, sesuaikan dengan data Anda)
+        var populationData = {
+            "Lok Bahu": 5000,
+            "Loa Bakung": 4000,
+            "Loa Buah": 4000,
+            "Karang Anyar": 4000,
+            "Karang Asam Ilir": 4000,
+            "Karang Asam Ulu": 4000,
+            "Teluk Lerong Ulu": 4000
+            // Tambahkan data sesuai kelurahan Anda
+        };
+
+        // Fungsi untuk menampilkan popup dengan jumlah penduduk
+        function onEachFeature(feature, layer) {
+            if (feature.properties && feature.properties.NAMOBJ) {
+                var kelurahanName = feature.properties.NAMOBJ;
+                var population = populationData[kelurahanName] || 'Data tidak tersedia';
+                layer.bindPopup("<b>" + kelurahanName + "</b><br>Jumlah Penduduk: " + population);
+            }
+        }
+
+        // Memuat file GeoJSON
+        fetch('Kunjang.geoJson')
+            .then(response => response.json())
+            .then(data => {
+                L.geoJson(data, {
+                    onEachFeature: onEachFeature
+                }).addTo(map);
+            });
+    </script>
+</body>
+
+</html>
